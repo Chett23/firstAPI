@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser')
+const randomstring = require('randomstring')
 
 app.use(bodyParser.json())
 app.use(require('./headers'))
@@ -84,7 +85,7 @@ let userItems = [
     qty: 0
   },
   {
-    id: 11, 
+    id: 11,
     name: 'Boots',
     image: '/images/Boots.jpg',
     price: 3.99,
@@ -97,7 +98,7 @@ let userItems = [
     price: 3.99,
     qty: 0
   },
-  { 
+  {
     id: 13,
     name: 'Jewlery',
     image: '/images/Jewlery.jpg',
@@ -127,8 +128,9 @@ app.get('/cart', (req, res) => {
 })
 
 app.post('/cart', (req, res) => {
-  console.log(req.body)
-  userCart.push(req.body)
+  let temp = req.body
+  temp.id = randomstring.generate(7)
+  userCart.push(temp)
   res.send(userCart)
 })
 
@@ -138,6 +140,6 @@ app.delete('/cart/:id', (req, res) => {
 })
 
 app.listen(5000, (err) => {
-  if (err){throw err}
+  if (err) { throw err }
   console.log('Server up and running on port 5000')
 })
