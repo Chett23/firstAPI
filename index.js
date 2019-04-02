@@ -9,97 +9,82 @@ app.use(require('./headers'))
 let userItems = [
   {
     name: 'Fire Place',
-    image: '/images/FirePlace.jpg',
+    image: 'https://images-na.ssl-images-amazon.com/images/I/410gOhZjUSL._SY300_QL70_.jpg',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'iPad',
-    image: '/images/Ipad.jpg',
+    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/image/AppleInc/aos/published/images/i/pa/ipad/pro/ipad-pro-12-11-select-201810_FMT_WHH?wid=2000&amp;hei=2000&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1540576009788',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'iPhone',
-    image: '/images/Iphone.jpg',
+    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/image/AppleInc/aos/published/images/i/ph/iphone7/select/iphone7-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1550795429263',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Chicken Nuggets',
-    image: '/images/ChickenNuggets.jpg',
+    image: 'https://addapinch.com/wp-content/uploads/2011/09/Recipes-Chicken-Nuggets-14-440x600-440x270.jpg',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Apples',
-    image: '/images/Apple.jpg',
+    image: 'https://www.specialtyproduce.com/sppics/193.png',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Ice Cream',
-    image: '/images/IceCream.jpg',
+    image: 'https://static01.nyt.com/images/2016/05/24/dining/24COOKING-BANANA-ICE-CREAM1/24COOKING-BANANA-ICE-CREAM1-threeByTwoMediumAt2X-v2.jpg',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Soda',
-    image: '/images/Soda.jpg',
+    image: 'https://cf.ltkcdn.net/best/images/std/182338-425x283-best-selling-sodas.jpg',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Shoes',
-    image: '/images/Shoes.jpg',
+    image: 'https://cdn.shopify.com/s/files/1/1104/4168/products/Allbirds_W_Wool_Runner_Kotare_GREY_ANGLE_0f3bfe63-ac7d-4106-9acf-d26f8414ac53_600x600.png?v=1542064004',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Shirt',
-    image: '/images/Shirt.jpg',
+    image: 'https://static5.cilory.com/288824-large_default/nologo-off-white-red-casual-shirt.jpg',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Coat',
-    image: '/images/Coat.jpg',
+    image: 'https://cdn.shopify.com/s/files/1/0092/8553/3755/products/product-image-550363401_543x_91801403-ec14-4e18-abe9-e9681fc57cca_394x.jpg?v=1547408378',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Jacket',
-    image: '/images/Jacket.jpg',
+    image: 'https://www.revzilla.com/product_images/0091/7906/scorpion1909_leather_jacket_black_750x750.jpg',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Boots',
-    image: '/images/Boots.jpg',
+    image: 'https://dsw.scene7.com/is/image/DSWShoes/317277_200_ss_01?$pdp-image$',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Books',
-    image: '/images/Books.jpg',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQae-1m0UIpCeH9Khulq2qfvj0LRj6z1gkv-uosegTavbyKezZeUw',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Jewlery',
-    image: '/images/Jewlery.jpg',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBses_-yvsM5vQiZsWmbI2jqDaVZdQZp17ysUyQrmRFR6R4PmD6w',
     price: 3.99,
-    qty: 0
   },
   {
     name: 'Knowledge',
-    image: '/images/Knowledge.jpg',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtLmcBL-Sd8FEHM0DoBRf88iWoOl-urO_spnoAJrLX6X68JIbn-g',
     price: 3.99,
-    qty: 0
   }
 ]
 let userCart = []
-for(let i in userItems){
+for (let i in userItems) {
   userItems[i].id = randomstring.generate(7)
 }
 
@@ -112,14 +97,10 @@ app.get('/items', (req, res) => {
 })
 
 app.post('/items', (req, res) => {
-  let temp = req.body
-  if (req.body.id){
+  if (req.body.id) {
     let tempObj = userItems.find((el) => el.id === req.body.id)
-    userItems[userItems.indexOf(tempObj)] = temp
-    // console.log('with id: ',req.body.id)
-    // console.log(tempObj)
-    // console.log(userItems.indexOf(tempObj))
-  } else{
+    userItems[userItems.indexOf(tempObj)] = req.body
+  } else {
     temp.id = randomstring.generate(7)
     userItems.push(temp)
   }
@@ -136,12 +117,23 @@ app.get('/cart', (req, res) => {
 })
 
 app.post('/cart', (req, res) => {
-  userCart.push(req.body)
+  let tempIndex = userCart.findIndex((el) => el.id === req.body.id)
+  if (tempIndex >= 0) {
+      userCart[tempIndex].qty = userCart[tempIndex].qty + 1
+    } else {
+      req.body.qty = 1
+      userCart.push(req.body)
+  }
   res.send(userCart)
 })
 
 app.delete('/cart/:id', (req, res) => {
-  userCart = userCart.filter((x) => { return x.id != req.params.id })
+  let tempIndex = userCart.findIndex((el) => el.id === req.params.id)
+  if (userCart[tempIndex].qty > 1) {
+    userCart[tempIndex].qty--
+  } else {
+    userCart = userCart.filter((x) => { return x.id != req.params.id })
+  }
   res.send(userCart)
 })
 
