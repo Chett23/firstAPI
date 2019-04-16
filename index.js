@@ -2,10 +2,13 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken')
 
+
+//'mongodb://admin:admin@chesterfirstdb-shard-00-00-i7cmi.mongodb.net:27017,chesterfirstdb-shard-00-01-i7cmi.mongodb.net:27017,chesterfirstdb-shard-00-02-i7cmi.mongodb.net:27017/StoreDB?ssl=true&replicaSet=ChesterFirstDB-shard-0&authSource=admin&retryWrites=true'
 
 const monk = require('monk')
-const url = 'mongodb://admin:admin@chesterfirstdb-shard-00-00-i7cmi.mongodb.net:27017,chesterfirstdb-shard-00-01-i7cmi.mongodb.net:27017,chesterfirstdb-shard-00-02-i7cmi.mongodb.net:27017/StoreDB?ssl=true&replicaSet=ChesterFirstDB-shard-0&authSource=admin&retryWrites=true'
+const url = process.env.DB_URL
 const db = monk(url)
 db.then(() => {
   console.log('connected')
@@ -16,10 +19,9 @@ const userCart = db.get('Cart')
 const users = db.get('Users')
 
 
+app.use(require('./headers'))
 app.use(bodyParser.json())
 app.use(cookieParser())
-app.use(require('./headers'))
-
 
 app.get('/', (req, res) => {
   res.send('success')
@@ -69,7 +71,7 @@ app.post('/cart', (req, res) => {
         userCart.insert(req.body)
       } else {
         let tempQty = item.qty + 1
-        userCart.update({ _id: req.body._id }, { $set: {qty: tempQty } })
+        userCart.update({ _id: req.body._id }, { $set: { qty: tempQty } })
       }
     }).then(result => {
       res.send(result)
@@ -83,32 +85,50 @@ app.delete('/cart/:_id', (req, res) => {
         userCart.findOneAndDelete(item._id)
       } else {
         let tempQty = item.qty - 1
-        userCart.update({ _id: req.params._id }, { $set: {qty: tempQty } })
+        userCart.update({ _id: req.params._id }, { $set: { qty: tempQty } })
       }
     }).then(result => {
       res.send(result)
     })
 })
 
-app.get('/users/:_id', (req, res) => {
-  users.findOne(req.params._id)
-    .then(result => {
-      resolve(result)
-    })
-    .catch(err =>
-      resolve(err)
-    )
+app.post('/users', (req, res) => {
+  console.log('name: ' + req.body.userName)
+  if (req.body.newUser) {
+    users.insert({ userName: req.body.userName, password: req.body.password })
+      .then(user => {
+        console.log(user)
+        let { password, ...userResponse } = user
+        console.log(userResponse)
+        res.send(userResponse)
+      })
+      .catch(err =>
+        console.log(err)
+      )
+  } else {
+    users.findOne({ userName: req.body.userName, password: req.body.password })
+      .then(user => {
+        console.log(user)
+        let { password, ...userResponse } = user
+        console.log(userResponse)
+        res.send(userResponse)
+      })
+      .catch(err =>
+        console.log(err)
+      )
+  }
+})
+
+
+app.use((err, req, res, next) => {
+  console.log('error', err)
+  res.send('Sorry, but its broken...')
 })
 
 app.listen(5000, (err) => {
   if (err) { throw err }
   console.log('Server up and running on port 5000')
 })
-
-
-
-
-
 
 
 
