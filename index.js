@@ -5,8 +5,7 @@ const cookieParser = require('cookie-parser')
 const jwt = require('jsonwebtoken')
 
 
-//'mongodb://admin:admin@chesterfirstdb-shard-00-00-i7cmi.mongodb.net:27017,chesterfirstdb-shard-00-01-i7cmi.mongodb.net:27017,chesterfirstdb-shard-00-02-i7cmi.mongodb.net:27017/StoreDB?ssl=true&replicaSet=ChesterFirstDB-shard-0&authSource=admin&retryWrites=true'
-
+const port = process.env.PORT || 5000
 const monk = require('monk')
 const url = process.env.DB_URL
 const db = monk(url)
@@ -125,7 +124,7 @@ app.use((err, req, res, next) => {
   res.send('Sorry, but its broken...')
 })
 
-app.listen(5000, (err) => {
+app.listen(port, (err) => {
   if (err) { throw err }
   console.log('Server up and running on port 5000')
 })
