@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken')
 
 const port = process.env.PORT || 5000
 const monk = require('monk')
-const url = process.env.DB_URL
+const url = process.env.DB_URL || "mongodb://admin:admin@chesterfirstdb-shard-00-00-i7cmi.mongodb.net:27017,chesterfirstdb-shard-00-01-i7cmi.mongodb.net:27017,chesterfirstdb-shard-00-02-i7cmi.mongodb.net:27017/StoreDB?ssl=true&replicaSet=ChesterFirstDB-shard-0&authSource=admin&retryWrites=true"
 const db = monk(url)
 db.then(() => {
   console.log('connected')
@@ -16,6 +16,7 @@ db.then(() => {
 const userItems = db.get('Inventory')
 const userCart = db.get('Cart')
 const users = db.get('Users')
+const secret = 'shhh, dont tell anyone!'
 
 
 app.use(require('./headers'))
@@ -92,36 +93,41 @@ app.delete('/cart/:_id', (req, res) => {
 })
 
 app.post('/users', (req, res) => {
-  console.log('name: ' + req.body.userName)
   if (req.body.newUser) {
-    users.insert({ userName: req.body.userName, password: req.body.password })
-      .then(user => {
-        console.log(user)
-        let { password, ...userResponse } = user
-        console.log(userResponse)
-        res.send(userResponse)
+    users.findOne({ userName: req.body.userName })
+      .then(credentials => {
+        if (credentials === null) {
+          users.insert({ userName: req.body.userName, password: req.body.password })
+        }
       })
-      .catch(err =>
+      .then(() => {
+        users.findOne({ userName: req.body.userName, password: req.body.password })
+          .then(user => {
+            let { password, ...userRedacted } = user
+            // let token = jwt.sign(userRedacted, secret)
+            // res.cookie("token", token, {
+            //   domain: 'localhost',
+            //   path: "/",
+            //   httpOnly: "false"
+            // })
+            res.status(200).send(userRedacted)
+          })
+      })
+      .catch(err => {
         console.log(err)
-      )
+        res.status(401).send("login Failed")
+      })
   } else {
     users.findOne({ userName: req.body.userName, password: req.body.password })
       .then(user => {
-        console.log(user)
         let { password, ...userResponse } = user
-        console.log(userResponse)
         res.send(userResponse)
       })
-      .catch(err =>
+      .catch(err => {
         console.log(err)
-      )
+        res.send("login Failed")
+      })
   }
-})
-
-
-app.use((err, req, res, next) => {
-  console.log('error', err)
-  res.send('Sorry, but its broken...')
 })
 
 app.listen(port, (err) => {
