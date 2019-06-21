@@ -18,7 +18,7 @@ const userCart = db.get('Cart')
 const users = db.get('Users')
 const secret = 'shhh, dont tell anyone!'
 
-app.use(express.static('ui_build'))
+app.use(express.static('build'))
 app.use(require('./headers'))
 app.use(bodyParser.json())
 app.use(cookieParser())
